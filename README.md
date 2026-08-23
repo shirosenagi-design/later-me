@@ -153,6 +153,10 @@ directories.
 
 ## Running locally
 
+Hackathon judges and evaluators should start with
+[JUDGE_QUICKSTART.md](JUDGE_QUICKSTART.md). It uses judge-owned credentials and
+the existing localhost-only Windows delivery architecture.
+
 ### Prerequisites
 
 - Windows 10 or 11 for the protected profile and live Task Scheduler path
