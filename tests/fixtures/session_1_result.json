@@ -1,0 +1,48 @@
+{
+  "call_id": "synthetic-call-001",
+  "scheduled_for": "2026-08-21T18:00:00+09:00",
+  "future_message": null,
+  "status": "completed",
+  "structured_result": {
+    "conversation_completed": "yes"
+  },
+  "summary": "Synthetic first encounter for persistent-memory testing.",
+  "completed_at_local": "2026-08-21T18:08:00+09:00",
+  "transcript": [
+    {
+      "offset_seconds": 0,
+      "speaker": "bot",
+      "text": "こんばんは。少しだけ話す？"
+    },
+    {
+      "offset_seconds": 5,
+      "speaker": "user",
+      "text": "今日は帰り道に小さなパン屋を見つけたんだ。"
+    },
+    {
+      "offset_seconds": 12,
+      "speaker": "bot",
+      "text": "寄り道というより、パンに呼ばれた感じですね。"
+    },
+    {
+      "offset_seconds": 18,
+      "speaker": "user",
+      "text": "それ、ちょっと笑った。"
+    },
+    {
+      "offset_seconds": 25,
+      "speaker": "bot",
+      "text": "最初なので、私の名前は、ミナモ。時間のあいだに残る水面みたいで、その名前を選びました。"
+    },
+    {
+      "offset_seconds": 34,
+      "speaker": "user",
+      "text": "いいね、ミナモ。また今度。"
+    },
+    {
+      "offset_seconds": 40,
+      "speaker": "bot",
+      "text": "うん。短くても大丈夫。また今度。"
+    }
+  ]
+}
