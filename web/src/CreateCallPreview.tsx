@@ -1,14 +1,62 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+﻿import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import type { ProfileLanguage } from './Onboarding'
+
 export type ReservationInput = { scheduled_for: string; future_message: string; timezone?: string }
-type Props = { initialDate?: Date | null; mode: 'create' | 'change'; busy: boolean; error: string; maxDateIso?: string | null; onCancel: () => void; onSubmit: (value: ReservationInput) => Promise<void> }
+type Props = { initialDate?: Date | null; mode: 'create' | 'change'; language: ProfileLanguage; busy: boolean; error: string; maxDateIso?: string | null; onCancel: () => void; onSubmit: (value: ReservationInput) => Promise<void> }
 type RuntimeStatus = { booking_minimum_minutes?: number; dev_short_horizon_enabled?: boolean }
 const pad = (value: number) => String(value).padStart(2, '0')
 const dateValue = (date: Date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 const timeValue = (date: Date) => `${pad(date.getHours())}:${pad(date.getMinutes())}`
 
-export default function CreateCallPreview({ initialDate, mode, busy, error, maxDateIso, onCancel, onSubmit }: Props) {
+const copy = {
+  en: {
+    careLine: 'Keep an eye on the you a little further ahead.',
+    createHeading: 'When should they come meet you?',
+    changeHeading: 'When should we move it to?',
+    developmentMinimum: (minutes: number) => `Live development check: at least ${minutes} minutes from now`,
+    normalMinimum: 'At least 4 hours from now',
+    publicMaximum: 'Up to the latest time available in this limited public trial',
+    normalMaximum: 'Up to 10 years from now',
+    oneAtATime: 'You can reserve one future call at a time.',
+    rangeError: 'Choose a time within the available reservation window.',
+    messageLabel: 'Leave something for your future self?',
+    messagePlaceholder: 'Optional. Leave a line that can become the starting point for your future call.',
+    saving: 'Placing it…',
+    changeSubmit: 'Move it to this time',
+    createSubmit: 'Leave it at this time',
+    back: 'Back',
+    now: 'Now',
+    futureYou: 'Future you',
+    nowSmall: 'Present',
+    futureSmall: 'Future me',
+  },
+  ja: {
+    careLine: '少し先のあなたを、気にかけておく。',
+    createHeading: 'いつ、会いに来てもらう？',
+    changeHeading: 'いつに、置きなおす？',
+    developmentMinimum: (minutes: number) => `開発ライブ確認：最短${minutes}分後から`,
+    normalMinimum: '最短4時間後から',
+    publicMaximum: 'この期間限定公開で配信できる日時まで',
+    normalMaximum: '最大10年先まで',
+    oneAtATime: '予約できる電話は、一度に一本だけ。',
+    rangeError: '利用できる予約期間内の時間を選んでください。',
+    messageLabel: '未来の自分へ、何か残しておく？',
+    messagePlaceholder: '空欄でも大丈夫。未来の電話のきっかけになる一言を。',
+    saving: '置いています…',
+    changeSubmit: 'この時間に置きなおす',
+    createSubmit: 'この時間に置いておく',
+    back: '戻る',
+    now: 'いま',
+    futureYou: '未来のあなた',
+    nowSmall: 'Now',
+    futureSmall: 'Future me',
+  },
+} as const
+
+export default function CreateCallPreview({ initialDate, mode, language, busy, error, maxDateIso, onCancel, onSubmit }: Props) {
   const [runtime, setRuntime] = useState({ minimumMinutes: 240, developmentShortHorizon: false })
   const { minimumMinutes, developmentShortHorizon } = runtime
+  const text = copy[language]
   // Limits intentionally snapshot when the form opens; the Python service validates again on submit.
   // oxlint-disable-next-line react/purity
   const limits = useMemo(() => {
@@ -29,14 +77,15 @@ export default function CreateCallPreview({ initialDate, mode, busy, error, maxD
   const selected = new Date(`${date}T${time}`); const valid = Number.isFinite(selected.getTime()) && selected >= limits.min && selected <= limits.max
   const submit = async (event: FormEvent) => { event.preventDefault(); if (valid && !busy) await onSubmit({ scheduled_for: `${date} ${time}`, future_message: message, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone }) }
   return <section className="form-view" aria-labelledby="future-call-title">
-    <header className="view-heading"><p className="eyebrow">PLACE A FUTURE CALL</p><h1 id="future-call-title">Later, Me.</h1><p>少し先のあなたを、気にかけておく。</p></header>
+    <header className="view-heading"><p className="eyebrow">PLACE A FUTURE CALL</p><h1 id="future-call-title">Later, Me.</h1><p>{text.careLine}</p></header>
     <div className="form-story-grid"><form className="ocean-form" onSubmit={submit}>
-      <h2>{mode === 'change' ? 'いつに、置きなおす？' : 'いつ、会いに来てもらう？'}</h2>
+      <h2>{mode === 'change' ? text.changeHeading : text.createHeading}</h2>
       <div className="date-time-row"><label><span>DATE</span><input type="date" value={date} min={dateValue(limits.min)} max={dateValue(limits.max)} onInput={(e) => setDate(e.currentTarget.value)} required /></label><label><span>TIME</span><input type="time" value={time} onInput={(e) => setTime(e.currentTarget.value)} required /></label></div>
-      <ul className="rules"><li>{developmentShortHorizon ? `開発ライブ確認：最短${minimumMinutes}分後から` : '最短4時間後から'}</li><li>{maxDateIso ? 'この期間限定公開で配信できる日時まで' : '最大10年先まで'}</li><li>予約できる電話は、一度に一本だけ。</li></ul>
-      {!valid && <p className="range-error" role="status">利用できる予約期間内の時間を選んでください。</p>}
-      {mode === 'create' && <label className="message-field"><span>未来の自分へ、何か残しておく？</span><textarea value={message} maxLength={500} placeholder="空欄でも大丈夫。未来の電話のきっかけになる一言を。" onChange={(e) => setMessage(e.target.value)} /><small>{message.length} / 500</small></label>}
-      {error && <p className="form-error" role="alert">{error}</p>}<div className="form-actions"><button className="primary-button" type="submit" disabled={!valid || busy}>{busy ? '置いています…' : mode === 'change' ? 'この時間に置きなおす' : 'この時間に置いておく'}</button><button className="quiet-button" type="button" onClick={onCancel}>戻る</button></div>
-    </form><div className="story-path" aria-hidden="true"><div className="story-orb now-orb">いま<small>Now</small></div><div className="dotted-current" /><span className="tiny-fish">› › ›</span><div className="story-orb future-orb">未来の<br />あなた<small>Future me</small></div></div></div>
+      <ul className="rules"><li>{developmentShortHorizon ? text.developmentMinimum(minimumMinutes) : text.normalMinimum}</li><li>{maxDateIso ? text.publicMaximum : text.normalMaximum}</li><li>{text.oneAtATime}</li></ul>
+      {!valid && <p className="range-error" role="status">{text.rangeError}</p>}
+      {mode === 'create' && <label className="message-field"><span>{text.messageLabel}</span><textarea value={message} maxLength={500} placeholder={text.messagePlaceholder} onChange={(e) => setMessage(e.target.value)} /><small>{message.length} / 500</small></label>}
+      {error && <p className="form-error" role="alert">{error}</p>}<div className="form-actions"><button className="primary-button" type="submit" disabled={!valid || busy}>{busy ? text.saving : mode === 'change' ? text.changeSubmit : text.createSubmit}</button><button className="quiet-button" type="button" onClick={onCancel}>{text.back}</button></div>
+    </form><div className="story-path" aria-hidden="true"><div className="story-orb now-orb">{text.now}<small>{text.nowSmall}</small></div><div className="dotted-current" /><span className="tiny-fish">› › ›</span><div className="story-orb future-orb">{text.futureYou}<small>{text.futureSmall}</small></div></div></div>
   </section>
 }
+
