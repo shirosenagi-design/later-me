@@ -1,0 +1,62 @@
+envVarGroups:
+  - name: later-me-public-shared
+    envVars:
+      - key: PHONE_ENCRYPTION_KEY
+        generateValue: true
+
+services:
+  - type: web
+    name: later-me-public-live
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    autoDeployTrigger: "off"
+    envVars:
+      - fromGroup: later-me-public-shared
+      - key: DATABASE_URL
+        fromDatabase:
+          name: later-me-public-db
+          property: connectionString
+      - key: PUBLIC_LIVE_ENABLED
+        value: "true"
+      - key: PUBLIC_MAX_CALLS_PER_PHONE
+        value: "1"
+      - key: CALL_E_MAX_CALLS
+        sync: false
+      - key: PUBLIC_BOOKING_CLOSE_AT
+        sync: false
+      - key: PUBLIC_DISPATCH_END_AT
+        sync: false
+
+  - type: cron
+    name: later-me-public-dispatch
+    runtime: docker
+    region: singapore
+    schedule: "* * * * *"
+    dockerfilePath: ./Dockerfile.cron
+    dockerContext: .
+    dockerCommand: python public_dispatch_due.py
+    autoDeployTrigger: "off"
+    envVars:
+      - fromGroup: later-me-public-shared
+      - key: DATABASE_URL
+        fromDatabase:
+          name: later-me-public-db
+          property: connectionString
+      - key: CALL_E_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_RELATIONSHIP_MODEL
+        value: gpt-5.6-terra
+      - key: PUBLIC_DISPATCH_BATCH_LIMIT
+        value: "3"
+
+databases:
+  - name: later-me-public-db
+    plan: free
+    region: singapore
+    ipAllowList: []

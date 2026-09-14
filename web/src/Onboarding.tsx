@@ -24,7 +24,7 @@ const copy = {
     phoneHint: 'Use international format: +, country code, then your number.',
     ownNumber: 'I confirm that this is my own phone number.',
     permission: 'CALL-E may call this number only for future calls that I schedule myself.',
-    privacy: 'Your number stays in protected local server storage and is used only for your scheduled future calls.',
+    privacy: 'For this limited hackathon trial, your number is encrypted in protected server storage and is used only to deliver the future call you schedule.',
     submit: 'Enter Ocean',
   },
   ja: {
@@ -35,7 +35,7 @@ const copy = {
     phoneHint: '「+」「国番号」「電話番号」の国際形式で入力してください。',
     ownNumber: 'これは私自身の電話番号です。',
     permission: '私が自分で予約した未来の電話に限り、CALL-Eがこの番号へ電話することを許可します。',
-    privacy: '番号はローカルサーバーの保護領域に保存され、あなた自身が予約した未来の電話にだけ使われます。',
+    privacy: 'このハッカソン期間限定試用では、番号はサーバー側で暗号化して保存され、あなた自身が予約した未来の電話の配信にだけ使われます。',
     submit: 'Oceanへ入る',
   },
 } as const
@@ -73,7 +73,7 @@ export default function Onboarding({ busy, error, onSubmit }: Props) {
 
         <div className="onboarding-content">
           <header className="onboarding-heading">
-            <p className="eyebrow">FIRST RUN · はじめに</p>
+            <p className="eyebrow">HACKATHON LIMITED TRIAL · REAL CALL-E CALLS</p>
             <h1 id="onboarding-title">Choose your language</h1>
             <p>ことばを選んでください。</p>
           </header>
