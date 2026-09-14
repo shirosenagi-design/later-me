@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import './App.css'
 import CreateCallPreview, { type ReservationInput } from './CreateCallPreview'
 import Onboarding, { type FirstRunProfileInput, type ProfileLanguage } from './Onboarding'
@@ -27,7 +27,7 @@ const copy = {
     historyHeading: 'Past Calls',
     emptyHistory: 'No call history yet.',
     callsUnit: (count: number) => `${count} ${count === 1 ? 'call' : 'calls'}`,
-    careLine: 'Keep an eye on the you a little further ahead.',
+    careLine: 'Take care of your future self, just a little further ahead.',
     nextCall: 'Next call',
     waitingSoon: 'It is almost time for your call.',
     countdown: (days: number, hours: number, minutes: number) => `in ${days ? `${days}d ` : ''}${hours ? `${hours}h ` : ''}${minutes}m`,
@@ -35,7 +35,7 @@ const copy = {
     deliveryNeedsAttention: 'Checking delivery status. The same call will not be redialed automatically.',
     change: 'Change',
     cancel: 'Cancel',
-    publicRange: 'From 4 hours ahead until the end of this limited public trial',
+    publicRange: 'From 4 hours from now until the end of this limited public trial',
     normalRange: 'From 4 hours ahead up to 10 years',
     trialFull: 'The limited real CALL-E call capacity has been reached.',
     trialClosed: 'New reservations for this limited public trial are closed.',
@@ -190,4 +190,3 @@ function App() {
     <section className="content">{(view === 'create' || view === 'change') ? <CreateCallPreview mode={view} language={language} initialDate={pendingDate} maxDateIso={publicLive ? data.trial?.dispatch_end_at : null} busy={busy} error={error} onCancel={() => { setError(''); setView('home') }} onSubmit={submitReservation} /> : view === 'history' ? <section className="history-view quiet-history"><header className="view-heading quiet-heading">{trialLabel && <p className="eyebrow">{trialLabel}</p>}<h1>{text.historyHeading}</h1><p className="completed-call-count">{text.callsUnit(data.completed_call_count)}</p></header>{visibleHistory.length ? <div className="history-list quiet-history-list">{visibleHistory.map((item, index) => { const when = item.occurred_at ? new Date(item.occurred_at) : null; return <article className="history-card quiet-history-card" key={`${item.occurred_at}-${index}`}><div className="history-light" /><div>{when && <p className="eyebrow">{dateFormat.format(when)} {timeFormat.format(when)} · {historyStatusLabel(item)}</p>}{item.trace && <p className="trace-copy">{item.trace}</p>}{!item.trace && item.summary && <p className="trace-copy">{item.summary}</p>}{item.future_message && <p className="saved-message">{text.pastMe}: 「{item.future_message}」</p>}{item.failure && <p className="delivery-warning" role="status">{item.failure}</p>}</div></article> })}</div> : <div className="empty-history quiet-empty-history"><h2>{text.emptyHistory}</h2></div>}</section> : <section className="home-view quiet-home"><header className="home-heading quiet-heading"><p className="eyebrow">{trialLabel || (data.pending ? 'WAITING FOR YOU' : 'FOR LATER')}</p><h1>{data.pending ? 'Next Call' : 'Later, Me.'}</h1><p className="future-care-line">{text.careLine}</p></header>{data.pending && pendingDate ? <div className="home-grid quiet-home-grid"><section className="next-card quiet-water-card"><p className="section-label">{text.nextCall}</p><h2>{dateFormat.format(pendingDate)}</h2><time>{timeFormat.format(pendingDate)}</time><p className="countdown">{countdown(pendingDate, now, language)}</p>{data.pending.future_message && <p className="saved-message">「{data.pending.future_message}」</p>}{dispatching && <p className="delivery-warning" role="status">{text.dispatching}</p>}{deliveryNeedsAttention && <p className="delivery-warning" role="alert">{text.deliveryNeedsAttention}</p>}{!dispatching && <div className="card-actions"><button className="primary-button" onClick={() => setView('change')}>{text.change}</button><button className="danger-button" disabled={busy} onClick={cancelReservation}>{text.cancel}</button></div>}</section></div> : <div className="empty-home quiet-empty-home"><section className="empty-water-card"><div className="empty-water-content"><p className="quiet-range">{publicLive ? text.publicRange : text.normalRange}</p>{trialFull ? <p className="delivery-warning" role="status">{text.trialFull}</p> : trialClosed ? <p className="delivery-warning" role="status">{text.trialClosed}</p> : <button className="primary-button" onClick={() => setView('create')}>{text.placeCall}</button>}</div></section></div>}{error && <p className="connection-error" role="alert">{error}</p>}<button className="history-peek quiet-history-peek" onClick={() => setView('history')}><span>≋</span><strong>{text.history}</strong><small>{text.callsUnit(data.completed_call_count)}</small></button></section>}</section></div></main>
 }
 export default App
-

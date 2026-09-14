@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import type { ProfileLanguage } from './Onboarding'
 
 export type ReservationInput = { scheduled_for: string; future_message: string; timezone?: string }
@@ -10,23 +10,23 @@ const timeValue = (date: Date) => `${pad(date.getHours())}:${pad(date.getMinutes
 
 const copy = {
   en: {
-    careLine: 'Keep an eye on the you a little further ahead.',
-    createHeading: 'When should they come meet you?',
+    careLine: 'Take care of your future self, just a little further ahead.',
+    createHeading: 'When should your future self call?',
     changeHeading: 'When should we move it to?',
     developmentMinimum: (minutes: number) => `Live development check: at least ${minutes} minutes from now`,
     normalMinimum: 'At least 4 hours from now',
-    publicMaximum: 'Up to the latest time available in this limited public trial',
+    publicMaximum: 'Within this limited public trial window',
     normalMaximum: 'Up to 10 years from now',
     oneAtATime: 'You can reserve one future call at a time.',
     rangeError: 'Choose a time within the available reservation window.',
     messageLabel: 'Leave something for your future self?',
     messagePlaceholder: 'Optional. Leave a line that can become the starting point for your future call.',
     saving: 'Placing it…',
-    changeSubmit: 'Move it to this time',
-    createSubmit: 'Leave it at this time',
+    changeSubmit: 'Save this new time',
+    createSubmit: 'Schedule this call',
     back: 'Back',
     now: 'Now',
-    futureYou: 'Future you',
+    futureYou: 'Future self',
     nowSmall: 'Present',
     futureSmall: 'Future me',
   },
@@ -88,4 +88,3 @@ export default function CreateCallPreview({ initialDate, mode, language, busy, e
     </form><div className="story-path" aria-hidden="true"><div className="story-orb now-orb">{text.now}<small>{text.nowSmall}</small></div><div className="dotted-current" /><span className="tiny-fish">› › ›</span><div className="story-orb future-orb">{text.futureYou}<small>{text.futureSmall}</small></div></div></div>
   </section>
 }
-
