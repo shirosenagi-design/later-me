@@ -67,6 +67,11 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 @media(max-width:900px){.onboarding-content{width:auto;margin-left:0;padding:120px 45px 60px}.onboarding-brand span,.onboarding-path{display:none}}
 @media(max-width:650px){.onboarding-shell{min-height:100vh;border:0;border-radius:0}.onboarding-brand{left:24px;top:24px}.onboarding-content{padding:105px 20px 42px}.language-choice{grid-template-columns:1fr}.onboarding-form{padding:24px 20px}.onboarding-heading h1{font-size:38px}}
 
+.public-demo-banner{position:fixed;z-index:100;top:0;left:0;width:100%;padding:9px 18px;display:flex;gap:10px 24px;align-items:center;justify-content:center;flex-wrap:wrap;color:#f5ffff;text-align:center;background:rgba(28,101,117,.94);box-shadow:0 8px 24px rgba(24,91,106,.16);font:11px/1.45 sans-serif;letter-spacing:.035em}.public-demo-banner strong{font-weight:700}.public-demo-banner span{opacity:.82}.ocean-page.public-demo-mode{padding-top:clamp(78px,8vw,96px)}
+.demo-sample-label{margin:0 0 8px;color:#8c7830;font:700 9px/1.4 sans-serif;letter-spacing:.18em}
+
+@media(max-width:650px){.public-demo-banner{padding:7px 12px;gap:2px;font-size:9px}.public-demo-banner span{width:100%}.ocean-page.public-demo-mode{padding-top:68px}}
+
 /* === Quiet water restoration: behavior carries the idea, copy stays quiet === */
 .quiet-heading>p:last-child{display:none}
 .quiet-heading>p.future-care-line{

@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: later-me-interactive-demo
+    runtime: static
+    rootDir: web
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_PUBLIC_DEMO
+        value: "1"

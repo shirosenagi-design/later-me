@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 export type ReservationInput = { scheduled_for: string; future_message: string }
-type Props = { initialDate?: Date | null; mode: 'create' | 'change'; busy: boolean; error: string; onCancel: () => void; onSubmit: (value: ReservationInput) => Promise<void> }
+type Props = { initialDate?: Date | null; mode: 'create' | 'change'; busy: boolean; error: string; onCancel: () => void; onSubmit: (value: ReservationInput) => Promise<void>; publicDemo?: boolean }
 type RuntimeStatus = { booking_minimum_minutes?: number; dev_short_horizon_enabled?: boolean }
 const pad = (value: number) => String(value).padStart(2, '0')
 const dateValue = (date: Date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 const timeValue = (date: Date) => `${pad(date.getHours())}:${pad(date.getMinutes())}`
 
-export default function CreateCallPreview({ initialDate, mode, busy, error, onCancel, onSubmit }: Props) {
+export default function CreateCallPreview({ initialDate, mode, busy, error, onCancel, onSubmit, publicDemo = false }: Props) {
   const [runtime, setRuntime] = useState({ minimumMinutes: 240, developmentShortHorizon: false })
   const { minimumMinutes, developmentShortHorizon } = runtime
   // Limits intentionally snapshot when the form opens; the Python service validates again on submit.
@@ -14,7 +14,7 @@ export default function CreateCallPreview({ initialDate, mode, busy, error, onCa
   const limits = useMemo(() => { const min = new Date(Date.now() + minimumMinutes * 60 * 1000); min.setSeconds(0, 0); min.setMinutes(min.getMinutes() + 1); const max = new Date(); max.setFullYear(max.getFullYear() + 10); return { min, max } }, [minimumMinutes])
   const seed = initialDate && initialDate > limits.min ? initialDate : limits.min
   const [date, setDate] = useState(dateValue(seed)); const [time, setTime] = useState(timeValue(seed)); const [message, setMessage] = useState('')
-  useEffect(() => { let active = true; void fetch('/api/health', { headers: { Accept: 'application/json' } }).then((response) => response.json() as Promise<RuntimeStatus>).then((health) => { if (!active || health.dev_short_horizon_enabled !== true || health.booking_minimum_minutes !== 5) return; setRuntime({ minimumMinutes: health.booking_minimum_minutes, developmentShortHorizon: true }); if (mode === 'create' && !initialDate) { const shortMinimum = new Date(Date.now() + health.booking_minimum_minutes * 60 * 1000); shortMinimum.setSeconds(0, 0); shortMinimum.setMinutes(shortMinimum.getMinutes() + 1); setDate(dateValue(shortMinimum)); setTime(timeValue(shortMinimum)) } }).catch(() => undefined); return () => { active = false } }, [initialDate, mode])
+  useEffect(() => { if (publicDemo) return; let active = true; void fetch('/api/health', { headers: { Accept: 'application/json' } }).then((response) => response.json() as Promise<RuntimeStatus>).then((health) => { if (!active || health.dev_short_horizon_enabled !== true || health.booking_minimum_minutes !== 5) return; setRuntime({ minimumMinutes: health.booking_minimum_minutes, developmentShortHorizon: true }); if (mode === 'create' && !initialDate) { const shortMinimum = new Date(Date.now() + health.booking_minimum_minutes * 60 * 1000); shortMinimum.setSeconds(0, 0); shortMinimum.setMinutes(shortMinimum.getMinutes() + 1); setDate(dateValue(shortMinimum)); setTime(timeValue(shortMinimum)) } }).catch(() => undefined); return () => { active = false } }, [initialDate, mode, publicDemo])
   const selected = new Date(`${date}T${time}`); const valid = Number.isFinite(selected.getTime()) && selected >= limits.min && selected <= limits.max
   const submit = async (event: FormEvent) => { event.preventDefault(); if (valid && !busy) await onSubmit({ scheduled_for: `${date} ${time}`, future_message: message }) }
   return <section className="form-view" aria-labelledby="future-call-title">

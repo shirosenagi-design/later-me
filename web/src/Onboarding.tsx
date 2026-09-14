@@ -13,7 +13,10 @@ type Props = {
   busy: boolean
   error: string
   onSubmit: (input: FirstRunProfileInput) => Promise<void>
+  publicDemo?: boolean
 }
+
+const DEMO_PHONE = '+819012345678'
 
 const copy = {
   en: {
@@ -40,12 +43,37 @@ const copy = {
   },
 } as const
 
-export default function Onboarding({ busy, error, onSubmit }: Props) {
+const demoCopy = {
+  en: {
+    eyebrow: 'INTERACTIVE DEMO',
+    heading: 'A line to your future self',
+    intro: 'This browser-only demo stores a fictional reservation locally. No phone call is placed.',
+    phoneLabel: 'Demo phone number',
+    phoneHint: 'This fictional E.164 number is used only to demonstrate onboarding.',
+    ownNumber: 'I understand this is a fictional demo number and no phone call will be placed.',
+    permission: 'I consent to store this demo reservation only in this browser.',
+    privacy: "Demo state stays in this browser's local storage. CALL-E and OpenAI are not contacted.",
+    submit: 'Enter Ocean',
+  },
+  ja: {
+    eyebrow: 'INTERACTIVE DEMO',
+    heading: '未来のあなたへ、線をひく。',
+    intro: 'このブラウザだけで、架空の未来の電話を置くデモです。実際の電話は発信されません。',
+    phoneLabel: 'デモ用の電話番号',
+    phoneHint: 'オンボーディング確認専用の、架空のE.164番号です。',
+    ownNumber: 'これは架空のデモ番号で、電話は発信されないことを確認しました。',
+    permission: 'このデモ予約を、このブラウザだけに保存することに同意します。',
+    privacy: 'デモ状態はブラウザのlocalStorageにだけ残ります。CALL-EとOpenAIには接続しません。',
+    submit: 'Oceanへ入る',
+  },
+} as const
+
+export default function Onboarding({ busy, error, onSubmit, publicDemo = false }: Props) {
   const [language, setLanguage] = useState<ProfileLanguage | null>(null)
-  const [phone, setPhone] = useState('')
+  const [phone, setPhone] = useState(publicDemo ? DEMO_PHONE : '')
   const [ownNumberConfirmed, setOwnNumberConfirmed] = useState(false)
   const [futureCallsAuthorized, setFutureCallsAuthorized] = useState(false)
-  const selectedCopy = language ? copy[language] : null
+  const selectedCopy = language ? (publicDemo ? demoCopy[language] : copy[language]) : null
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -63,7 +91,7 @@ export default function Onboarding({ busy, error, onSubmit }: Props) {
   )
 
   return (
-    <main className="ocean-page onboarding-page">
+    <main className={`ocean-page onboarding-page${publicDemo ? ' public-demo-mode' : ''}`}>
       <section className="onboarding-shell" aria-labelledby="onboarding-title">
         <div className="onboarding-brand" aria-hidden="true">
           <strong>Later, Me.</strong>
@@ -112,9 +140,10 @@ export default function Onboarding({ busy, error, onSubmit }: Props) {
                 <input
                   type="tel"
                   inputMode="tel"
-                  autoComplete="tel"
+                  autoComplete={publicDemo ? 'off' : 'tel'}
                   value={phone}
                   onChange={(event) => setPhone(event.target.value)}
+                  readOnly={publicDemo}
                   placeholder="+ country code · number"
                   required
                   aria-describedby="phone-format-hint"
