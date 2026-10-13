@@ -36,4 +36,3 @@ databases:
   - name: later-me-public-db
     plan: free
     region: singapore
-    ipAllowList: []
